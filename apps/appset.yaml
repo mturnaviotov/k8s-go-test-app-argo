@@ -5,29 +5,31 @@ metadata:
   namespace: argocd
 spec:
   generators:
-  - git:
-      repoURL: https://github.com/mturnaviotov/k8s-go-test-app-argo.git
-      revision: HEAD
-      directories:
-      - path: apps/
+  - list:
+      elements:
+      - env: dev
+      - env: qa
+      - env: prod
 
   template:
     metadata:
-      name: todo
+      name: todo-{{env}}
       labels:
-        app_env: "todo"
+        app_env: "{{env}}"
 
     spec:
       project: todo
       destination:
         server: https://host.docker.internal:26443
-        namespace: todo
+        namespace: todo-{{env}}
 
       source:
         repoURL: https://github.com/mturnaviotov/go-k8s-test-app.git
         targetRevision: HEAD
         path: charts/
         helm:
+          valueFiles:
+          - "environments/{{env}}/values.yaml"
           parameters:
           - name: git.commit
             value: "{{revision}}"
@@ -36,3 +38,5 @@ spec:
         automated:
           prune: true
           selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
