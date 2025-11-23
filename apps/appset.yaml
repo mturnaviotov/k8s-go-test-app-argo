@@ -9,29 +9,35 @@ spec:
   - list:
       elements:
       - env: dev
-      - env: qa
+        path: dev
       - env: prod
+        path: prod
   template:
     metadata:
-      labels:
-        app_env: '{{env}}'
       name: todo-{{env}}
+      labels:
+        app.kubernetes.io/part-of: todo-project
+        app.kubernetes.io/env: "{{env}}"
     spec:
       destination:
         namespace: todo-{{env}}
         server: https://host.docker.internal:26443
       project: todo
-      source:
-        helm:
-          parameters:
-          - name: git.commit
-            value: '{{revision}}'
+      sources:
+      - helm:
           valueFiles:
-          - environments/{{env}}/values.yaml
+          - $values/environments/{{env}}/values.yaml
         path: charts/
-        repoURL: https://github.com/mturnaviotov/go-k8s-test-app.git
-        targetRevision: HEAD
+        repoURL: https://github.com/mturnaviotov/go-k8s-test-app
+        targetRevision: master
+      - directory: {}
+        path: .
+        ref: values
+        repoURL: https://github.com/mturnaviotov/k8s-go-test-app-argo
+        targetRevision: master
       syncPolicy:
         automated:
           prune: true
           selfHeal: true
+        syncOptions:
+        - CreateNamespace=true

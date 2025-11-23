@@ -1,2 +1,76 @@
-git:
-  commit: 5efdb118
+backend:
+  enabled: true
+  service:
+    type: ClusterIP
+    name: todo-dev-backend
+    port: 8080
+    listenPort: 8080
+
+  persistence:
+    enabled: true
+    size: 256M
+    storageClass: "" #"local-path"
+    accessMode: ReadWriteOnce
+
+  ingress:
+    enabled: true
+    className: traefik
+    host: todo-dev-backend.todo-dev.svc.cluster.local
+    serviceName: todo-dev-backend
+    tls:
+    - secretName: todo-dev-backend-tls
+      hosts:
+      - todo-dev-backend.todo-dev.svc.cluster.local
+    annotations:
+      kubernetes.io/ingress.className: traefik
+      cert-manager.io/cluster-issuer: local-ca
+      external-dns.alpha.kubernetes.io/hostname: todo-dev-backend.todo-dev.svc.cluster.local
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+
+  image:
+    repository: foxmuldercp/go-todo-backend
+    tag: a371d0c #latest
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "0.2G"
+    limits:
+      cpu: "200m"
+      memory: "0.5G"
+
+frontend:
+  service:
+    port: 80
+
+  backend:
+    host: todo-dev-backend.todo-dev.svc.cluster.local
+    port: 8080
+
+  ingress:
+    enabled: true
+    className: traefik
+    host: todo-dev-frontend.todo-dev.svc.cluster.local
+    serviceName: todo-dev-frontend
+    tls:
+    - secretName: todo-dev-frontend-tls
+      hosts:
+      - todo-dev-frontend.todo-dev.svc.cluster.local
+    annotations:
+      kubernetes.io/ingress.className: traefik
+      cert-manager.io/cluster-issuer: local-ca
+      external-dns.alpha.kubernetes.io/hostname: todo-dev-frontend.todo-dev.svc.cluster.local
+      traefik.ingress.kubernetes.io/router.entrypoints: "web,websecure"
+      #traefik.ingress.kubernetes.io/router.middlewares: "default-https-redirect@kubernetescrd"
+      #traefik.ingress.kubernetes.io/router.tls: "true"
+      #traefik.ingress.kubernetes.io/router.priority: "10"
+
+  image:
+    repository: foxmuldercp/go-todo-frontend
+    tag: latest
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "0.2G"
+    limits:
+      cpu: "200m"
+      memory: "0.5G"

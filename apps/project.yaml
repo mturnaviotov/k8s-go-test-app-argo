@@ -6,17 +6,12 @@ metadata:
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
-  # Project description
   description: Todo
-
-  # Allow manifests to deploy from any Git repos
   sourceRepos:
   - "*"
-  # дозволені місця деплою; можна звузити до певних namespace/серверів
   destinations:
   - namespace: "*"
     server: "*"
-  # додаткові флаги (опціонально)
 namespaceResourceWhitelist:
 - group: '*'
   kind: '*'
