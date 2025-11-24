@@ -9,9 +9,7 @@ spec:
   - list:
       elements:
       - env: dev
-        path: dev
       - env: prod
-        path: prod
   template:
     metadata:
       name: todo-{{env}}
@@ -29,12 +27,12 @@ spec:
           - $values/environments/{{env}}/values.yaml
         path: charts/
         repoURL: https://github.com/mturnaviotov/go-k8s-test-app
-        targetRevision: master
+        targetRevision: main
       - directory: {}
         path: .
         ref: values
         repoURL: https://github.com/mturnaviotov/k8s-go-test-app-argo
-        targetRevision: master
+        targetRevision: main
       syncPolicy:
         automated:
           prune: true
