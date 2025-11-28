@@ -51,7 +51,7 @@ frontend:
     enabled: true
     className: traefik
     host: todo-dev.zone.internal
-    serviceName: todo-frontend
+    serviceName: todo-dev-frontend
     tls:
     - secretName: todo-dev-frontend-tls
       hosts:
