@@ -1,0 +1,77 @@
+backend:
+  enabled: true
+  service:
+    type: ClusterIP
+    #name: todo-backend
+    port: 8080
+    listenPort: 8080
+
+  persistence:
+    enabled: true
+    size: 256M
+    storageClass: "" #"local-path"
+    accessMode: ReadWriteOnce
+
+  ingress:
+    enabled: true
+    className: traefik
+    host: todo-prod-backend.zone.internal
+    serviceName: todo-prod-backend
+    tls:
+    - secretName: todo-backend-tls
+      hosts:
+      - todo-prod-backend.zone.internal
+    annotations:
+      kubernetes.io/ingress.className: traefik
+      cert-manager.io/cluster-issuer: local-ca
+      external-dns.alpha.kubernetes.io/hostname: todo-prod-backend.zone.internal
+      traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+
+  image:
+    repository: foxmuldercp/go-todo-backend
+    tag: 5efdb11 #latest
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+
+frontend:
+  service:
+    port: 80
+
+  backend:
+    host: todo-prod-backend.todo.svc.cluster.local
+    port: 8080
+
+  ingress:
+    enabled: true
+    className: traefik
+    host: todo-prod.zone.internal
+    serviceName: todo-frontend
+    tls:
+    - secretName: todo-prod-frontend-tls
+      hosts:
+      - todo-prod.zone.internal
+    annotations:
+      kubernetes.io/ingress.className: traefik
+      cert-manager.io/cluster-issuer: local-ca
+      external-dns.alpha.kubernetes.io/hostname: todo-prod.zone.internal
+      traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+      #traefik.ingress.kubernetes.io/router.middlewares: "default-https-redirect@kubernetescrd"
+      #traefik.ingress.kubernetes.io/router.tls: "true"
+      #traefik.ingress.kubernetes.io/router.priority: "10"
+
+  image:
+    repository: foxmuldercp/go-todo-frontend
+    tag: latest
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi

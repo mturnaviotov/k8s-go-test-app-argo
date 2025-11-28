@@ -10,8 +10,12 @@ spec:
   sourceRepos:
   - "*"
   destinations:
-  - namespace: "*"
-    server: "*"
+  - namespace: "todo"
+    server: "orbstack"
+  - namespace: "todo-dev"
+    server: "orbstack"
+  - namespace: "todo-prod"
+    server: "orbstack"
 namespaceResourceWhitelist:
 - group: '*'
   kind: '*'

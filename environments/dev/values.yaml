@@ -2,7 +2,7 @@ backend:
   enabled: true
   service:
     type: ClusterIP
-    name: todo-dev-backend
+    #name: todo-backend
     port: 8080
     listenPort: 8080
 
@@ -15,42 +15,43 @@ backend:
   ingress:
     enabled: true
     className: traefik
-    host: todo-dev-back.zone.internal
+    host: todo-dev-backend.zone.internal
     serviceName: todo-dev-backend
     tls:
-    - secretName: todo-dev-backend-tls
+    - secretName: todo-backend-tls
       hosts:
-      - todo-dev-back.zone.internal
+      - todo-dev-backend.zone.internal
     annotations:
       kubernetes.io/ingress.className: traefik
       cert-manager.io/cluster-issuer: local-ca
-      external-dns.alpha.kubernetes.io/hostname: todo-dev-back.zone.internal
+      external-dns.alpha.kubernetes.io/hostname: todo-dev-backend.zone.internal
       traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
 
   image:
     repository: foxmuldercp/go-todo-backend
-    tag: a371d0c #latest
+    tag: 5efdb11 #latest
+
   resources:
     requests:
-      cpu: "100m"
-      memory: "0.2G"
+      cpu: 50m
+      memory: 32Mi
     limits:
-      cpu: "200m"
-      memory: "0.5G"
+      cpu: 100m
+      memory: 64Mi
 
 frontend:
   service:
     port: 80
 
   backend:
-    host: todo-dev-back.zone.internal
-    port: 443
+    host: todo-dev-backend.todo.svc.cluster.local
+    port: 8080
 
   ingress:
     enabled: true
     className: traefik
     host: todo-dev.zone.internal
-    serviceName: todo-dev-frontend
+    serviceName: todo-frontend
     tls:
     - secretName: todo-dev-frontend-tls
       hosts:
@@ -69,8 +70,8 @@ frontend:
     tag: latest
   resources:
     requests:
-      cpu: "100m"
-      memory: "0.2G"
+      cpu: 50m
+      memory: 32Mi
     limits:
-      cpu: "200m"
-      memory: "0.5G"
+      cpu: 100m
+      memory: 64Mi
